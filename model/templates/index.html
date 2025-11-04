@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LeetCode Tutor (model)</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      .container { max-width: 900px; margin: auto; }
+      .box { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 6px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 8px; border-bottom: 1px solid #eee; }
+      .btn { padding: 8px 12px; border: none; background: #007bff; color: white; border-radius: 4px; cursor: pointer; }
+      .btn:disabled { opacity: 0.6 }
+      .muted { color: #666; font-size: 0.9rem }
+      .section { margin-bottom: 1rem; }
+      .input-field { padding: 4px; margin-right: 8px; }
+      .chat-area { height: 200px; overflow: auto; border: 1px solid #eee; padding: 8px; margin-bottom: 8px; }
+      .chat-input { width: 80%; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>LeetCode Tutor (model folder)</h1>
+      <div class="box">
+        <h3>Your LeetCode Profile</h3>
+        <div class="section">
+          <label for="leetcode">LeetCode Username:</label>
+          <input id="leetcode" type="text" placeholder="Enter your LeetCode username" class="input-field" />
+          <button id="analyzeBtn" class="btn">Analyze</button>
+          <button id="recommendBtn" class="btn">Recommend</button>
+        </div>
+        <div>
+          <p class="muted">Or upload your practice CSV:</p>
+          <label for="file">Select CSV file</label>
+          <input id="file" type="file" accept=".csv" aria-label="user csv file" />
+          <button id="appendBtn" class="btn">Append New Problems</button>
+          <p class="muted">CSV should include at least a `title` column and optional `topic_tags`, `difficulty`, `status`.</p>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Chat with Agent</h3>
+        <div id="chatArea" class="chat-area"></div>
+        <input id="chatInput" class="chat-input" placeholder="Ask: 'Recommend problems' or 'What topics should I improve?'" aria-label="chat input" />
+        <button id="chatBtn" class="btn">Send</button>
+      </div>
+
+      <div class="box">
+        <h3>Results</h3>
+        <div id="results"></div>
+        <div style="margin-top:8px"><button id="loadMoreBtn" class="btn" style="display:none">Load more</button></div>
+      </div>
+    </div>
+
+    <script>
+      async function postData(endpoint, useFile = true) {
+        const username = document.getElementById('leetcode').value.trim();
+        
+        if (username) {
+          const fd = new FormData();
+          fd.append('leetcode_username', username);
+          const resp = await fetch(endpoint, { method: 'POST', body: fd });
+          return resp.json();
+        }
+        
+        if (!useFile) return { error: "Please enter a LeetCode username or select a CSV file" };
+        
+        const input = document.getElementById('file')
+        if (!input.files || input.files.length === 0) { 
+          return { error: "Please enter a LeetCode username or select a CSV file" };
+        }
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+        const resp = await fetch(endpoint, { method: 'POST', body: fd });
+        return resp.json();
+      }
+
+      document.getElementById('analyzeBtn').addEventListener('click', async ()=>{
+        const res = await postData('/analyze');
+        const rdiv = document.getElementById('results');
+        if (res.error) { rdiv.innerHTML = '<pre>'+res.error+'</pre>'; return }
+        let html = '<h4>Weak Topics</h4><table><tr><th>Topic</th><th>Score</th><th>GfG</th><th>Striver</th></tr>';
+        for (const t of res.weak_topics) {
+          html += `<tr><td>${t.topic}</td><td>${t.proficiency_score.toFixed(2)}</td><td><a href="${t.gfg_link}" target="_blank">GfG</a></td><td><a href="${t.striver_link}" target="_blank">Striver</a></td></tr>`
+        }
+        html += '</table>'
+        rdiv.innerHTML = html;
+      })
+
+      // track shown titles for dynamic 'load more'
+      let shownTitles = new Set();
+
+      async function loadMore(pageSize=12) {
+        const username = document.getElementById('leetcode').value.trim();
+        const payload = { leetcode_username: username, seen: Array.from(shownTitles), page_size: pageSize };
+        const resp = await fetch('/recommend/more', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const data = await resp.json();
+        if (data.error) { alert('Error: '+data.error); return }
+        appendRecommendations(data.recommended || []);
+        // hide button if none returned
+        if (!data.recommended || data.recommended.length === 0) {
+          document.getElementById('loadMoreBtn').style.display = 'none';
+        }
+      }
+
+      function appendRecommendations(list) {
+        const rdiv = document.getElementById('results');
+        let html = rdiv.innerHTML || '';
+        if (!html.includes('<h4>Recommended Problems</h4>')) {
+          html = '<h4>Recommended Problems</h4><table id="recTable"><tr><th>Title</th><th>Difficulty</th><th>Topics</th><th>Company</th><th>Score</th><th>GfG</th><th>Striver</th></tr></table>' + html;
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const table = doc.getElementById('recTable');
+        for (const p of list) {
+          const tr = doc.createElement('tr');
+          tr.innerHTML = `<td>${p.title}</td><td>${p.difficulty}</td><td>${p.topic_tags}</td><td>${p.company}</td><td>${(p.score||0).toFixed ? (p.score||0).toFixed(3) : p.score}</td><td><a href="${p.gfg_link}" target="_blank">GfG</a></td><td><a href="${p.striver_link}" target="_blank">Striver</a></td>`;
+          table.appendChild(tr);
+          shownTitles.add(p.title.toLowerCase().trim());
+        }
+        document.getElementById('results').innerHTML = doc.body.innerHTML;
+        // show load more button
+        document.getElementById('loadMoreBtn').style.display = 'inline-block';
+      }
+
+      document.getElementById('recommendBtn').addEventListener('click', async ()=>{
+        const res = await postData('/recommend');
+        const rdiv = document.getElementById('results');
+        if (res.error) { rdiv.innerHTML = '<pre>'+res.error+'</pre>'; return }
+        // reset shownTitles and populate with current recommendations
+        shownTitles = new Set();
+        document.getElementById('results').innerHTML = '';
+        appendRecommendations(res.recommended || []);
+        // render others separately
+        if (res.others && res.others.length) {
+          let html2 = '<h4 style="margin-top:1rem">Other Problems</h4><table><tr><th>Title</th><th>Difficulty</th><th>Topics</th><th>Company</th><th>GfG</th><th>Striver</th></tr>'
+          for (const p of res.others) {
+            html2 += `<tr><td>${p.title}</td><td>${p.difficulty}</td><td>${p.topic_tags}</td><td>${p.company}</td><td><a href="${p.gfg_link}" target="_blank">GfG</a></td><td><a href="${p.striver_link}" target="_blank">Striver</a></td></tr>`
+          }
+          html2 += '</table>'
+          document.getElementById('results').innerHTML += html2;
+        }
+      })
+
+      document.getElementById('loadMoreBtn').addEventListener('click', async ()=>{
+        await loadMore(12);
+      })
+
+      document.getElementById('appendBtn').addEventListener('click', async ()=>{
+        const res = await postData('/append', true);
+        const rdiv = document.getElementById('results');
+        if (res.error) { rdiv.innerHTML = '<pre>'+res.error+'</pre>'; return }
+        rdiv.innerHTML = `<p>Appended ${res.appended} new problems to system CSV.</p>`
+      })
+
+      document.getElementById('chatBtn').addEventListener('click', async ()=>{
+        const msg = document.getElementById('chatInput').value;
+        if (!msg) return;
+        const chatArea = document.getElementById('chatArea');
+        chatArea.innerHTML += '<div><b>You:</b> '+msg+'</div>';
+
+        let payload = { message: msg };
+        
+        // First try LeetCode username
+        const username = document.getElementById('leetcode').value.trim();
+        if (username) {
+          payload.leetcode_username = username;
+        } else {
+          // Fall back to CSV
+          const input = document.getElementById('file')
+          if (input.files && input.files[0]) {
+            payload.file_content = await input.files[0].text();
+          }
+        }
+
+        const resp = await fetch('/chat', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const data = await resp.json();
+        if (data.error) {
+          chatArea.innerHTML += '<div><b>Agent:</b> Error: '+data.error+'</div>';
+          return;
+        }
+        chatArea.innerHTML += '<div><b>Agent:</b> '+(data.reply||'')+' </div>';
+        if (data.recommended) {
+          let html = '<h4>Recommended Problems</h4><table><tr><th>Title</th><th>Difficulty</th><th>Topics</th><th>GfG</th><th>Striver</th></tr>';
+          for (const p of data.recommended) {
+            html += `<tr><td>${p.title}</td><td>${p.difficulty}</td><td>${p.topic_tags}</td><td><a href="${p.gfg_link}" target="_blank">GfG</a></td><td><a href="${p.striver_link}" target="_blank">Striver</a></td></tr>`
+          }
+          html += '</table>'
+          if (data.others && data.others.length) {
+            html += '<h4 style="margin-top:1rem">Other Problems</h4><table><tr><th>Title</th><th>Difficulty</th><th>Topics</th><th>GfG</th><th>Striver</th></tr>';
+            for (const p of data.others) {
+              html += `<tr><td>${p.title}</td><td>${p.difficulty}</td><td>${p.topic_tags}</td><td><a href="${p.gfg_link}" target="_blank">GfG</a></td><td><a href="${p.striver_link}" target="_blank">Striver</a></td></tr>`
+            }
+            html += '</table>'
+          }
+          document.getElementById('results').innerHTML = html;
+        }
+      })
+    </script>
+  </body>
+</html>
