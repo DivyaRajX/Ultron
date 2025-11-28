@@ -38,6 +38,8 @@ export default function Navbar() {
           <Link href="/working" className="hover:text-white transition">How It Works</Link>
           <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
           <Link href="/about" className="hover:text-white transition">About</Link>
+          <Link href={"https://ats-checker-gnxi.onrender.com/"} className="hover:text-white transition">Check your resume</Link>
+
 
           {/* LOGIN / USER DROPDOWN */}
           {user ? (
@@ -75,7 +77,7 @@ export default function Navbar() {
           <Link href="/working" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">How It Works</Link>
           <Link href="/pricing" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">Pricing</Link>
           <Link href="/about" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">About</Link>
-
+          <Link href={"https://ats-checker-gnxi.onrender.com/"}>Check your resume</Link>
           {user ? (
             <>
               <span className="text-white">Hi, {user.user_name}</span>
