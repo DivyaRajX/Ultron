@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 
 export default function SignupPage() {
@@ -59,7 +60,13 @@ export default function SignupPage() {
                         Log in
                     </CardTitle>
                 </CardHeader>
-
+                <CardContent>
+                    <Link href={"/sign-up"} className={cn(buttonVariants({
+                        variant: "link"
+                    }), "text-center w-full")}>
+                        Don&apos;t have an account? Sign-up 
+                    </Link>
+                </CardContent>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-5">
                         

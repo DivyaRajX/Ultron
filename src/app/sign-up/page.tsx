@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 
@@ -16,7 +16,7 @@ export default function SignupPage() {
         user_email: "",
         password: "",
     });
-
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState("");
 
@@ -44,6 +44,7 @@ export default function SignupPage() {
                 setMsg(data.error || "Something went wrong");
             } else {
                 setMsg(data.message || "Signup successful");
+                router.push("/sign-in");
             }
         } catch (err) {
             setMsg("Network error");
