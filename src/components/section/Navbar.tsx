@@ -35,7 +35,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-8 text-gray-300">
           <Link href="/features" className="hover:text-white transition">Features</Link>
-          <Link href="/working" className="hover:text-white transition">How It Works</Link>
+          <Link href={"/discuss"} className="hover:text-white transition">Discuss Questions</Link>
           <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
           <Link href="/about" className="hover:text-white transition">About</Link>
           <Link href={"https://ats-checker-gnxi.onrender.com/"} className="hover:text-white transition">Check your resume</Link>
@@ -74,7 +74,8 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden flex flex-col items-center gap-6 bg-[#0a0a0a] py-6 border-t border-[#1a1a1a]">
           <Link href="/features" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">Features</Link>
-          <Link href="/working" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">How It Works</Link>
+          <Link href={"/discuss"} className="hover:text-white transition">Discuss Questions</Link>
+
           <Link href="/pricing" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">Pricing</Link>
           <Link href="/about" onClick={() => setOpen(false)} className="text-gray-300 hover:text-white transition">About</Link>
           <Link href={"https://ats-checker-gnxi.onrender.com/"}>Check your resume</Link>

@@ -6,60 +6,68 @@ export async function GET(
 ) {
   const { username } = params;
 
-  const query = `
-    query getUserProfile($username: String!) {
-      matchedUser(username: $username) {
-        username
-        submitStatsGlobal {
-          acSubmissionNum {
-            difficulty
-            count
-            submissions
-          }
-        }
-      }
-    }
-  `;
+  const BASE = "https://alfa-leetcode-api.onrender.com";
+
 
   try {
-    const res = await fetch("https://leetcode.com/graphql", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, variables: { username } }),
-    });
+    const [
+      profileRes,
+      solvedRes,
+      contestRes,
+      submissionsRes,
+      badgesRes,
+      langRes,
+    ] = await Promise.all([
+      fetch(`${BASE}/${username}`),
+      fetch(`${BASE}/${username}/solved`),
+      fetch(`${BASE}/${username}/contest`),
+      fetch(`${BASE}/${username}/submission`),
+      fetch(`${BASE}/${username}/badges`),
+      fetch(`${BASE}/${username}/language`),
+    ]);
 
-    const json = await res.json();
-    if (!json.data || !json.data.matchedUser)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const profile = await profileRes.json();
+    const solved = await solvedRes.json();
+    const contest = await contestRes.json();
+    const submissions = await submissionsRes.json();
+    const badges = await badgesRes.json();
+    const languageStats = await langRes.json();
 
-    const stats = json.data.matchedUser.submitStatsGlobal.acSubmissionNum;
+    // If no profile exists
+    if (!profile || profile.error) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
 
-    const easy = stats.find((s: any) => s.difficulty === "Easy")?.count || 0;
-    const medium = stats.find((s: any) => s.difficulty === "Medium")?.count || 0;
-    const hard = stats.find((s: any) => s.difficulty === "Hard")?.count || 0;
+    console.log([username, profile, solved, contest, submissions, badges]);
 
-    const totalSubmissions =
-      stats.reduce((acc: number, s: any) => acc + s.submissions, 0) || 1;
-    const totalAccepted =
-      stats.reduce((acc: number, s: any) => acc + s.count, 0);
+    return NextResponse.json(
+      {
+        username,
 
-    const accuracy = totalAccepted / totalSubmissions;
-    const totalProblems = 3100; // Approx total number of problems
-    const solved = easy + medium + hard;
+        profile,           // full profile
+        solved,            // solved counts
+        contest,           // contest rating/details
+        submissions,       // recent submissions
+        badges,            // LC badges
+        languages: languageStats,  // language stats
 
-    // Approximate avg_accept_rate same as accuracy (no per-question rates available)
-    const avg_accept_rate = accuracy;
-
-    return NextResponse.json({
-      solved_easy: easy,
-      solved_medium: medium,
-      solved_hard: hard,
-      total_problems: totalProblems,
-      solved,
-      accuracy: parseFloat(accuracy.toFixed(3)),
-      avg_accept_rate: parseFloat(avg_accept_rate.toFixed(3)),
-    });
+        summary: {
+          totalSolved: solved?.solved || 0,
+          easy: solved?.easySolved || 0,
+          medium: solved?.mediumSolved || 0,
+          hard: solved?.hardSolved || 0,
+          ranking: profile?.ranking,
+        },
+      },
+      { status: 200 }
+    );
   } catch (err) {
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch LeetCode data" },
+      { status: 500 }
+    );
   }
 }

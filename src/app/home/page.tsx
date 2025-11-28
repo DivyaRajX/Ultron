@@ -23,6 +23,8 @@ export default function Home() {
       if (!res.ok) throw new Error("Failed to fetch LeetCode profile");
 
       const data = await res.json();
+      
+      console.log(data);
       setUserData(data);
 
       const easy = data.solved_easy;
