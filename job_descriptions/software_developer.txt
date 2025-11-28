@@ -1,0 +1,8 @@
+We are looking for a Software Developer responsible for building scalable applications. 
+The role requires strong knowledge of Java, Python, or C++. Hands-on experience with 
+data structures, algorithms, REST APIs, and version control (Git) is important. 
+Responsibilities include writing clean and efficient code, debugging issues, 
+optimizing performance, and collaborating with cross-functional teams. 
+Familiarity with cloud platforms like AWS or Azure is a plus. 
+Understanding of databases such as MySQL or MongoDB and software development 
+methodologies like Agile/Scrum is required.

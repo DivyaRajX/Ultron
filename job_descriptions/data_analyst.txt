@@ -1,0 +1,6 @@
+We are hiring a Data Analyst to interpret data, analyze results, and support business 
+decision-making. The ideal candidate should be proficient in SQL, Excel, and Python 
+(Pandas, NumPy). Responsibilities include preparing dashboards, generating reports, 
+identifying trends, and building data-driven insights. Familiarity with visualization 
+tools such as Tableau or Power BI is required. Knowledge of statistical techniques, 
+A/B testing, data cleaning, and working with large datasets will be helpful.

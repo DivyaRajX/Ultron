@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATS Resume Checker</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>ATS Resume Checker</h2>
+
+    <label>Select Job Role</label>
+    <select id="role">
+        <option value="software_developer">Software Developer</option>
+        <option value="web_developer">Web Developer</option>
+        <option value="data_analyst">Data Analyst</option>
+        <option value="aiml_engineer">AIML Engineer</option>
+    </select>
+
+    <label>Upload Resume (PDF)</label>
+    <input type="file" id="resume">
+
+    <button onclick="analyze()">Analyze</button>
+
+    <div id="result"></div>
+</div>
+
+<script src="static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+We are looking for an AI/ML Engineer to design, develop, and deploy machine learning 
+models. Strong understanding of machine learning algorithms, neural networks, and 
+NLP techniques is required. Hands-on experience with TensorFlow, PyTorch, or Scikit-learn 
+is expected. The role involves data preprocessing, model training, hyperparameter tuning, 
+and evaluating model performance. Familiarity with cloud ML services, MLOps pipelines, 
+and working with large datasets is a plus. Knowledge of Python, statistics, and 
+mathematical modeling is essential.

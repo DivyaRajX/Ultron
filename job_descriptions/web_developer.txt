@@ -1,0 +1,6 @@
+We need a Web Developer skilled in building responsive and user-friendly web applications. 
+A strong understanding of HTML, CSS, JavaScript, and modern frameworks like React or Vue 
+is required. The developer should be able to work with REST APIs, integrate third-party 
+services, and optimize websites for speed and SEO. Knowledge of backend technologies 
+such as Node.js, Express, or Django is beneficial. Experience with Git, UI/UX principles, 
+cross-browser compatibility, and deployment workflows is preferred.
