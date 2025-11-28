@@ -7,22 +7,25 @@
 <body>
 
 <div class="container">
-    <h2>ATS Resume Checker</h2>
 
-    <label>Select Job Role</label>
-    <select id="role">
+    <h1 class="title">ATS Resume Checker</h1>
+    <p class="subtitle">Upload your resume and get ATS score + suggestions instantly.</p>
+
+    <label class="input-label">Select Job Role</label>
+    <select id="role" class="input-box">
         <option value="software_developer">Software Developer</option>
         <option value="web_developer">Web Developer</option>
         <option value="data_analyst">Data Analyst</option>
         <option value="aiml_engineer">AIML Engineer</option>
     </select>
 
-    <label>Upload Resume (PDF)</label>
-    <input type="file" id="resume">
+    <label class="input-label">Upload Resume (PDF)</label>
+    <input type="file" id="resume" class="input-box">
 
-    <button onclick="analyze()">Analyze</button>
+    <button class="btn" onclick={analyze()}>Analyze Resume</button>
 
-    <div id="result"></div>
+    <div id="result" class="result-box"></div>
+
 </div>
 
 <script src="static/script.js"></script>

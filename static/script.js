@@ -11,10 +11,13 @@ function analyze() {
         body: formData
     })
     .then(res => res.json())
-    .then(data => {
+    .then(res => {
+        console.log(res)
+
         document.getElementById("result").innerHTML = `
-            <h3>Score: ${data.score}</h3>
-            <p><b>Missing Keywords:</b> ${data.missing_keywords.join(", ")}</p>
+            <h2>Message: ${res.message}</h2>
+            <h3>Score: ${res.score}</h3>
+            <p><b>Missing Keywords:</b> ${res.missing_keywords.join(", ")}</p>
         `;
     });
 }
