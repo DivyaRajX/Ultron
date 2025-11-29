@@ -21,10 +21,6 @@ export default function Home() {
       const res = await fetch("/api/me");
       const data = await res.json();
 
-      if (!res.ok || !data?.user) {
-        router.push("/sign-in");
-        return;
-      }
 
       setUser(data.user);
     };
