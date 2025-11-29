@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [profile, setProfile] = useState("");
@@ -11,6 +12,27 @@ export default function Home() {
   const [parsed, setParsed] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [user, setUser] = useState("");
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const res = await fetch("/api/me");
+      const data = await res.json();
+
+      if (!res.ok || !data?.user) {
+        router.push("/sign-in");
+        return;
+      }
+
+      setUser(data.user);
+    };
+
+    loadUser();
+  }, []);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

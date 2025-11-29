@@ -3,8 +3,21 @@
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 export default function Hero() {
   const router = useRouter();
+    const [user, setUser] = useState("");
+  
+  
+    useEffect(() => {
+      const loadUser = async () => {
+        const res = await fetch("/api/me");
+        const data = await res.json();  
+        setUser(data.user);
+      };
+      console.log("USER IN HERO:", user);
+      loadUser();
+    }, []);
   return (
     <section className="relative min-h-screen flex flex-col justify-center items-center bg-[#0a0a0a] text-white overflow-hidden">
       {/* Background Grid Pattern */}
@@ -30,7 +43,7 @@ export default function Hero() {
         </p>
 
         <div className="flex justify-center gap-4">
-          <Button onClick={() => router.push("/home")} className="bg-[#7847eb] hover:bg-[#693bd8] text-white px-6 py-3 rounded-xl text-lg transition">
+          <Button onClick={() => router.push(user === "" ? "/sign-in": "/home")} className="bg-[#7847eb] hover:bg-[#693bd8] text-white px-6 py-3 rounded-xl text-lg transition">
             Get Started
           </Button>
           <Button variant="outline" className="border-gray-500 text-gray-300 hover:bg-gray-800 px-6 py-3 rounded-xl text-lg">
