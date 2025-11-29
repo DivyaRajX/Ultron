@@ -1,14 +1,34 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
 
-export default async function ShowData() {
-    const supabase = await createClient();
+import { Button } from "@/components/ui/button";
 
-    const { data: users } = await supabase.from("Testing Table").select();
-    console.log(users);
+export default function ShowData() {
+    const fetchData = async () => {
+        const fakeData = {
+            username: "Akshay_Your_Bro",
+            question: "Summarise my problems and give pros/cons and next suggested question",
+            sub_limit: 200
+        };
+
+        try {
+            const res = await fetch("https://recommend-rf4a.onrender.com/recommend", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(fakeData)
+            });
+
+            const data = await res.json();
+            console.log("API RESPONSE =>", data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
 
     return (
-        <pre>
-            {JSON.stringify(users)}
-        </pre>
-    )
+        <section className="mt-20 flex items-center justify-center" >
+            <Button onClick={fetchData} variant={"secondary"}>Click me</Button>
+        </section>
+    );
 }
